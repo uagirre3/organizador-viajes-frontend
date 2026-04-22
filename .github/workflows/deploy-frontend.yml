@@ -1,0 +1,27 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: deploy-frontend-develop
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, arm64, raspberry]
+
+    steps:
+      - name: Sync repo on Raspberry
+        run: |
+          cd /home/unaiaguirre/proyectos/organizador-viajes-frontend
+          git fetch origin
+          git checkout develop
+          git reset --hard origin/develop
+
+      - name: Rebuild and restart frontend
+        run: |
+          cd /home/unaiaguirre/proyectos
+          docker compose up -d --build frontend
